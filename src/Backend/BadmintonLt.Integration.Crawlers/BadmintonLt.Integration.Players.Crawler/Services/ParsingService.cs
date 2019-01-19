@@ -1,36 +1,24 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using BadmintonLt.Integration.Players.Crawler.Entities;
-using Microsoft.Build.Utilities;
 using System.Threading.Tasks;
-using AngleSharp;
-using AngleSharp.Dom;
+using BadmintonLt.Integration.Players.Crawler.Domain.Entities;
+using BadmintonLt.Integration.Players.Crawler.Domain.Contracts.Providers;
 
 namespace BadmintonLt.Integration.Players.Crawler.Services
 {
     public class ParsingService
     {
-        private readonly IBrowsingContext _parsingContext;
+        private readonly IPlayersProvider _playersProvider;
 
-        public ParsingService()
+        public ParsingService(IPlayersProvider playersProvider)
         {
-            _parsingContext = BrowsingContext.New(Configuration.Default.WithDefaultLoader());
+            _playersProvider = playersProvider;
         }
 
         public async Task<IEnumerable<Player>> GetPlayersFromAsync(string playersPageUrl)
         {
-            var document = await _parsingContext.OpenAsync(playersPageUrl);
-            var playersTable = document.QuerySelectorAll("table")[9];
-            var playerRows = playersTable.QuerySelectorAll("tr").Skip(2);
+            var players = await _playersProvider.GetPlayersFromAsync(playersPageUrl);
 
-            foreach (var playerRow in playerRows)
-            {
-                var playerData = playerRow.QuerySelectorAll("td");
 
-                var player = playerData[1].QuerySelector("a").TextContent;
-            }
-
-            var selected = document.QuerySelectorAll<IElement>("body > table > table");
             return null;
         }
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BadmintonLt.Integration.Players.Crawler.Providers;
 using BadmintonLt.Integration.Players.Crawler.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +34,7 @@ namespace BadmintonLt.Integration.Players.Crawler
 
             var playerPageUrlFormat = configuration["BadmintonLtPlayersPageUrlFormat"];
 
-            var parsingService = new ParsingService();
+            var parsingService = new ParsingService(new BadmintonLtPortalPlayersProvider());
 
             foreach (var competitionType in competitionTypes)
             {

@@ -1,7 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
-namespace BadmintonLt.Integration.Players.Crawler.Entities
+namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
 {
     public class Gender
     {
@@ -19,8 +19,6 @@ namespace BadmintonLt.Integration.Players.Crawler.Entities
 
     public class Player: IEquatable<Player>
     {
-        public Guid Id { get; }
-
         public Gender Gender { get; }
 
         public string Name { get; }
@@ -33,8 +31,7 @@ namespace BadmintonLt.Integration.Players.Crawler.Entities
 
         public Player(
             Gender gender,
-            string name, 
-            string surname,
+            string name,
             string profileUrl)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -42,20 +39,17 @@ namespace BadmintonLt.Integration.Players.Crawler.Entities
                 throw new ArgumentNullException(nameof(name));
             }
 
-            if (string.IsNullOrWhiteSpace(surname))
-            {
-                throw  new ArgumentNullException(nameof(surname));
-            }
-
             if (string.IsNullOrWhiteSpace(profileUrl))
             {
                 throw new ArgumentNullException(nameof(profileUrl));
             }
 
-            Id = Guid.NewGuid();
             Gender = gender;
-            Name = name;
-            Surname = surname;
+
+            var nameEntries = ParseNameEntry(name);
+            Name = nameEntries.ElementAtOrDefault(0) ?? string.Empty;
+            Surname = nameEntries.ElementAtOrDefault(1) ?? string.Empty;
+
             ProfileUrl = profileUrl;
         }
 
@@ -91,5 +85,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Entities
         {
             return !(current == other);
         }
+
+        private string[] ParseNameEntry(string name)
+            => name.Split(new[] { ' ' }, 2);
     }
 }
