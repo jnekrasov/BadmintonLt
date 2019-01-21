@@ -13,18 +13,15 @@ namespace BadmintonLt.Integration.Players.Crawler.Services
         private readonly IPlayersProvider _playersProvider;
         private readonly IPlayersRepository _playersRepository;
         private readonly IPlayersIntegration _playersIntegration;
-        private readonly IPlayerIdentityProvider _playerIdentityProvider;
 
         public PlayersService(
             IPlayersProvider playersProvider,
             IPlayersRepository playersRepository,
-            IPlayersIntegration playersIntegration,
-            IPlayerIdentityProvider playerIdentityProvider)
+            IPlayersIntegration playersIntegration)
         {
-            _playersProvider = playersProvider;
             _playersRepository = playersRepository;
+            _playersProvider = playersProvider;
             _playersIntegration = playersIntegration;
-            _playerIdentityProvider = playerIdentityProvider;
         }
 
         public async Task<IEnumerable<Player>> GetPlayersFromAsync(string playersPageUrl)
@@ -34,18 +31,21 @@ namespace BadmintonLt.Integration.Players.Crawler.Services
 
         public async Task Import(Player player)
         {
-            if (!_playersRepository.Exists(player))
+            if (!await _playersRepository.ExistsAsync(player))
             {
-                var identity = _playerIdentityProvider.CreateIdentity();
-                _playersRepository.AddFor(identity, player);
-                _playersIntegration.CreateFor(identity, player);
+                var identity = CreateIdentity();
+                await _playersRepository.AddForAsync(identity, player);
+                await _playersIntegration.CreatedForAsync(identity, player);
             }
             else
             {
-                var identity = _playerIdentityProvider.GetFor(player);
-                _playersRepository.UpdateFor(identity, player);
-                _playersIntegration.UpdateFor(identity, player);
+                await _playersRepository.UpdateAsync(player);
+                var identity = await _playersRepository.GetCorrelationIdentityForAsync(player);
+                await _playersIntegration.UpdatedForAsync(identity, player);
             }
         }
+
+        private static string CreateIdentity()
+            => Guid.NewGuid().ToString("D");
     }
 }

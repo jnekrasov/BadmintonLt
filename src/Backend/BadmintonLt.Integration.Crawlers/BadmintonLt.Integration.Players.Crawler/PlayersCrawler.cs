@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BadmintonLt.Integration.Players.Crawler.Domain.Entities;
+using BadmintonLt.Integration.Players.Crawler.Integration;
+using BadmintonLt.Integration.Players.Crawler.Persistence;
 using BadmintonLt.Integration.Players.Crawler.Providers;
 using BadmintonLt.Integration.Players.Crawler.Services;
 using Microsoft.Azure.WebJobs;
@@ -35,8 +37,18 @@ namespace BadmintonLt.Integration.Players.Crawler
                     configuration["CompetitionTypes"]);
 
             var playerPageUrlFormat = configuration["BadmintonLtPlayersPageUrlFormat"];
+            var playersStorageConnectionString =
+                configuration.GetConnectionString("StorageConnectionString");
+            var messageBusConnectionString =
+                configuration.GetConnectionString("MessageBusConnectionString");
+            var playersIntegrationTopicName =
+                configuration["PlayersIntegrationTopicName"];
 
-            var playersService = new PlayersService(new BadmintonLtPortalPlayersProvider());
+
+            var playersService = new PlayersService(
+                new BadmintonLtPortalPlayersProvider(),
+                new PlayersTableStorageRepository(playersStorageConnectionString),
+                new PlayersServiceBusTopicsIntegration(messageBusConnectionString, playersIntegrationTopicName));
 
             var players = new List<Player>();
 
@@ -46,7 +58,8 @@ namespace BadmintonLt.Integration.Players.Crawler
                 players.AddRange(await playersService.GetPlayersFromAsync(formattedPageUrl));
             }
 
-            foreach (var player in players.Distinct())
+            var distincted = players.Distinct();
+            foreach (var player in distincted)
             {
                 await playersService.Import(player);
             }
