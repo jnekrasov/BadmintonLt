@@ -5,11 +5,9 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence.Entities
 {
     public class PlayerEntity: TableEntity
     {
-        public PlayerEntity(string firstName, string lastName)
-        {
-            this.PartitionKey = lastName;
-            this.RowKey = firstName;
-        }
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
 
         public int Gender { get; set; }
 

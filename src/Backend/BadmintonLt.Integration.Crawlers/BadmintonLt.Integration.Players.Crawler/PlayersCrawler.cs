@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using BadmintonLt.Integration.Players.Crawler.Domain.Entities;
 using BadmintonLt.Integration.Players.Crawler.Providers;
 using BadmintonLt.Integration.Players.Crawler.Services;
 using Microsoft.Azure.WebJobs;
@@ -34,16 +36,20 @@ namespace BadmintonLt.Integration.Players.Crawler
 
             var playerPageUrlFormat = configuration["BadmintonLtPlayersPageUrlFormat"];
 
-            var parsingService = new ParsingService(new BadmintonLtPortalPlayersProvider());
+            var playersService = new PlayersService(new BadmintonLtPortalPlayersProvider());
+
+            var players = new List<Player>();
 
             foreach (var competitionType in competitionTypes)
             {
                 var formattedPageUrl = string.Format(playerPageUrlFormat, competitionType);
-                var players = await parsingService.GetPlayersFromAsync(formattedPageUrl);
+                players.AddRange(await playersService.GetPlayersFromAsync(formattedPageUrl));
             }
 
-            
-            
+            foreach (var player in players.Distinct())
+            {
+                await playersService.Import(player);
+            }
         }
     }
 }

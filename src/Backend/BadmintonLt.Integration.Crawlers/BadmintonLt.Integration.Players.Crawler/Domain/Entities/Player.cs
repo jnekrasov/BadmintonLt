@@ -21,13 +21,13 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
     {
         public Gender Gender { get; }
 
-        public string Name { get; }
+        public string FirstName { get; }
 
-        public string Surname { get; }
+        public string LastName { get; }
 
         public string ProfileUrl { get; }
 
-        public string FullName => $"{Name} {Surname}";
+        public string FullName => $"{FirstName} {LastName}";
 
         public Player(
             Gender gender,
@@ -47,8 +47,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
             Gender = gender;
 
             var nameEntries = ParseNameEntry(name);
-            Name = nameEntries.ElementAtOrDefault(0) ?? string.Empty;
-            Surname = nameEntries.ElementAtOrDefault(1) ?? string.Empty;
+            FirstName = nameEntries.ElementAtOrDefault(0) ?? string.Empty;
+            LastName = nameEntries.ElementAtOrDefault(1) ?? string.Empty;
 
             ProfileUrl = profileUrl;
         }
@@ -69,8 +69,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
             if (ReferenceEquals(this, other)) return false;
             if (GetType() != other.GetType()) return false;
 
-            return Name == other.Name 
-                   && Surname == other.Surname 
+            return FirstName == other.FirstName 
+                   && LastName == other.LastName 
                    && ProfileUrl == other.ProfileUrl;
         }
 
