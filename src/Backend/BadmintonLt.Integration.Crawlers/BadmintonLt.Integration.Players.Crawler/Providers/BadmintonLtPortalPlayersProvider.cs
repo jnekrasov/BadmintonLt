@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
@@ -12,8 +13,11 @@ using BadmintonLt.Integration.Players.Crawler.Providers.Exceptions;
 
 namespace BadmintonLt.Integration.Players.Crawler.Providers
 {
-    public class BadmintonLtPortalPlayersProvider: IPlayersProvider
+    public class BadmintonLtPortalPlayersProvider : IPlayersProvider
     {
+        private const string PlayerExternalIdParameterName = "zid";
+        private const string ClubExternalIdParameterName = "kid";
+
         private readonly IBrowsingContext _parsingContext;
 
         public BadmintonLtPortalPlayersProvider()
@@ -21,74 +25,73 @@ namespace BadmintonLt.Integration.Players.Crawler.Providers
             _parsingContext = BrowsingContext.New(Configuration.Default.WithDefaultLoader());
         }
 
-        public async Task<IEnumerable<Player>> GetPlayersFromAsync(string sourceUrl)
-        { 
+        public async Task<IEnumerable<Player>> GetPlayersFromAsync(string clubPlayersPageUrl)
+        {
             var result = new List<Player>();
-            var document = await _parsingContext.OpenAsync(sourceUrl);
+
+            var document = await _parsingContext.OpenAsync(clubPlayersPageUrl);
 
             var playersTable = GetPlayersTableFrom(document)
-                ?? throw new ParsingSourceFormatException(
-                    sourceUrl,
-                    nameof(BadmintonLtPortalPlayersProvider),
-                    "Cannot get players tabe");
+                               ?? throw new ParsingSourceFormatException(
+                                   clubPlayersPageUrl,
+                                   nameof(BadmintonLtPortalPlayersProvider),
+                                   "Cannot get players table");
 
-            var playersEntries = GetPlayersEntriesFrom(playersTable);
+            var playerEntries = GetPlayerEntriesFrom(playersTable);
 
-            foreach (var playersEntry in playersEntries)
+            foreach (var playerEntry in playerEntries)
             {
-                var playersData = playersEntry.QuerySelectorAll("td");
-
-                result.AddRange(GetPlayersFrom(playersData));
+                result.AddRange(GetPlayersFrom(playerEntry));
             }
 
             return result;
         }
 
-        private IEnumerable<IElement> GetPlayersEntriesFrom(IElement playersTable)
-            => playersTable.QuerySelectorAll("tr").Skip(2);
+        private IEnumerable<IElement> GetPlayerEntriesFrom(IElement playersTable)
+            => playersTable.QuerySelectorAll("tr").Skip(1);
 
         private IElement GetPlayersTableFrom(IDocument document)
         {
             var tables = document.QuerySelectorAll("table");
-            return tables.ElementAtOrDefault(9);
+            return tables.ElementAtOrDefault(10);
         }
 
-        private IEnumerable<Player> GetPlayersFrom(IHtmlCollection<IElement> playersData)
+        private IEnumerable<Player> GetPlayersFrom(
+            IElement playersData)
         {
-            foreach (var index in new[]{ 1, 7 })
-            {
-                var playerProfile = GetProfileFrom(playersData, index);
-                if (!playerProfile.HasValue)
-                {
-                    continue;
-                }
+            var genderImageEntry =
+                playersData.QuerySelector<IHtmlImageElement>("td:nth-child(2) > img");
+            var firstNameEntry =
+                playersData.QuerySelector<IHtmlAnchorElement>("td:nth-child(4) > a")
+                ?? playersData.QuerySelector<IHtmlAnchorElement>("td:nth-child(4) > b > a");
+            var lastNameEntry =
+                playersData.QuerySelector<IHtmlAnchorElement>("td:nth-child(5) > a")
+                ?? playersData.QuerySelector<IHtmlAnchorElement>("td:nth-child(5) > b > a");
+            var clubImageEntry =
+                playersData.QuerySelector<IHtmlImageElement>("td:nth-child(3) > img");
 
-                yield return new Player(
-                    GetGenderFrom(index),
-                    playerProfile.Value.name,
-                    playerProfile.Value.profileUrl);
-            }
+            yield return new Player(
+                GetExternalIdFrom(firstNameEntry, PlayerExternalIdParameterName),
+                GetGenderFrom(genderImageEntry),
+                firstNameEntry.TextContent,
+                lastNameEntry.TextContent,
+                firstNameEntry.Href,
+                new PlayerClub(
+                    GetExternalIdFrom(firstNameEntry, ClubExternalIdParameterName),
+                    clubImageEntry.Title,
+                    clubImageEntry.Source));
         }
 
-        private Gender GetGenderFrom(int index)
-            => index == 1 ? Gender.Male : Gender.Female;
-
-        private (string name, string profileUrl)? GetProfileFrom(
-            IHtmlCollection<IElement> playersData, 
-            int index)
+        private string GetExternalIdFrom(IHtmlAnchorElement anchor, string externalIdParameterName)
         {
-            var nameElement = playersData.ElementAtOrDefault(index);
-            if (nameElement == null)
-            {
-                return null;
-            }
-
-            if (!(nameElement.QuerySelector("a") is IHtmlAnchorElement nameEntry))
-            {
-                return null;
-            }
-
-            return (nameEntry.TextContent, nameEntry.Href);
+            var uriBuilder = new UriBuilder(anchor.Href);
+            var queryParameters = HttpUtility.ParseQueryString(uriBuilder.Query);
+            return queryParameters[externalIdParameterName];
         }
+
+        private Gender GetGenderFrom(IHtmlImageElement image)
+            => image.Source.Contains("V", StringComparison.InvariantCultureIgnoreCase)
+                ? Gender.Male
+                : Gender.Female;
     }
 }

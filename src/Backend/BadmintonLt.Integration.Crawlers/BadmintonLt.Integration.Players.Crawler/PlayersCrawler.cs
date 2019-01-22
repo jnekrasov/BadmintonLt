@@ -32,11 +32,7 @@ namespace BadmintonLt.Integration.Players.Crawler
                 .AddEnvironmentVariables()
                 .Build();
 
-            var competitionTypes =
-                JsonConvert.DeserializeObject<IEnumerable<string>>(
-                    configuration["CompetitionTypes"]);
-
-            var playerPageUrlFormat = configuration["BadmintonLtPlayersPageUrlFormat"];
+            var playersClubsPageUrl = configuration["BadmintonLtPlayersClubsPageUrl"];
             var playersStorageConnectionString =
                 configuration.GetConnectionString("StorageConnectionString");
             var messageBusConnectionString =
@@ -44,22 +40,15 @@ namespace BadmintonLt.Integration.Players.Crawler
             var playersIntegrationTopicName =
                 configuration["PlayersIntegrationTopicName"];
 
-
             var playersService = new PlayersService(
                 new BadmintonLtPortalPlayersProvider(),
+                new BadmintonLtPortalClubsProvider(), 
                 new PlayersTableStorageRepository(playersStorageConnectionString),
                 new PlayersServiceBusTopicsIntegration(messageBusConnectionString, playersIntegrationTopicName));
 
-            var players = new List<Player>();
+            var players = await playersService.GetPlayersFromAsync(playersClubsPageUrl);
 
-            foreach (var competitionType in competitionTypes)
-            {
-                var formattedPageUrl = string.Format(playerPageUrlFormat, competitionType);
-                players.AddRange(await playersService.GetPlayersFromAsync(formattedPageUrl));
-            }
-
-            var distincted = players.Distinct();
-            foreach (var player in distincted)
+            foreach (var player in players)
             {
                 await playersService.Import(player);
             }

@@ -31,6 +31,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
 
     public class Player : IEquatable<Player>
     {
+        public string ExternalId { get; }
+
         public Gender Gender { get; }
 
         public string FirstName { get; }
@@ -39,29 +41,21 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
 
         public string ProfileUrl { get; }
 
-        public Player(
-            Gender gender,
-            string fullName,
-            string profileUrl) 
-            : this(gender, profileUrl)
-        {
-            if (string.IsNullOrWhiteSpace(fullName))
-            {
-                throw new ArgumentNullException(nameof(fullName));
-            }
-
-            var nameEntries = ParseNameEntry(fullName);
-            FirstName = nameEntries.ElementAtOrDefault(0) ?? string.Empty;
-            LastName = nameEntries.ElementAtOrDefault(1) ?? string.Empty;
-        }
+        public PlayerClub Club { get; }
 
         public Player(
+            string externalId,
             Gender gender, 
             string firstName, 
             string lastName, 
-            string profileUrl)
-            : this(gender,profileUrl)
+            string profileUrl,
+            PlayerClub club)
         {
+            if (string.IsNullOrWhiteSpace(externalId))
+            {
+                throw new ArgumentNullException(nameof(externalId));
+            }
+
             if (string.IsNullOrWhiteSpace(firstName))
             {
                 throw new ArgumentNullException(nameof(firstName));
@@ -72,19 +66,19 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
                 throw new ArgumentNullException(nameof(lastName));
             }
 
-            FirstName = firstName;
-            LastName = lastName;
-        }
-
-        private Player(Gender gender, string profileUrl)
-        {
             if (string.IsNullOrWhiteSpace(profileUrl))
             {
                 throw new ArgumentNullException(nameof(profileUrl));
             }
 
+            Club = club ?? throw new ArgumentNullException(nameof(club));
+
+            FirstName = firstName;
+            LastName = lastName;
             ProfileUrl = profileUrl;
             Gender = gender;
+            ExternalId = externalId;
+
         }
 
         public override int GetHashCode()

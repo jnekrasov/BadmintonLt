@@ -18,15 +18,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Providers\" />
-    <Folder Include="Domain\" />
-    <Folder Include="Domain\Contracts\" />
-    <Folder Include="Domain\Contracts\Providers\" />
-    <Folder Include="Domain\Entities\" />
     <Folder Include="Providers\Exceptions\" />
     <Folder Include="Domain\Contracts\Persistence\" />
     <Folder Include="Persistence\Entities\" />
     <Folder Include="Domain\Contracts\Integration\" />
+    <Folder Include="Providers\Models\" />
     <Folder Include="Utilities\" />
   </ItemGroup>
 </Project>

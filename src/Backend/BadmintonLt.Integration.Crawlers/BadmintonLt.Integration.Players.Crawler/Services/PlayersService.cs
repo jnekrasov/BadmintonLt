@@ -11,22 +11,33 @@ namespace BadmintonLt.Integration.Players.Crawler.Services
     public class PlayersService
     {
         private readonly IPlayersProvider _playersProvider;
+        private readonly IPlayerClubUrlsProvider _playerClubUrlsProvider;
         private readonly IPlayersRepository _playersRepository;
         private readonly IPlayersIntegration _playersIntegration;
 
         public PlayersService(
             IPlayersProvider playersProvider,
+            IPlayerClubUrlsProvider playerClubUrlsProvider,
             IPlayersRepository playersRepository,
             IPlayersIntegration playersIntegration)
         {
             _playersRepository = playersRepository;
             _playersProvider = playersProvider;
             _playersIntegration = playersIntegration;
+            _playerClubUrlsProvider = playerClubUrlsProvider;
         }
 
-        public async Task<IEnumerable<Player>> GetPlayersFromAsync(string playersPageUrl)
+        public async Task<IEnumerable<Player>> GetPlayersFromAsync(string clubsPageUrl)
         {
-            return await _playersProvider.GetPlayersFromAsync(playersPageUrl);
+            var result = new List<Player>();
+            var playerClubUrls = await _playerClubUrlsProvider.GetPlayerClubUrlsAsyncFrom(clubsPageUrl);
+
+            foreach (var playerClubUrl in playerClubUrls)
+            {
+                result.AddRange(await _playersProvider.GetPlayersFromAsync(playerClubUrl));
+            }
+
+            return result;
         }
 
         public async Task Import(Player player)
@@ -35,7 +46,7 @@ namespace BadmintonLt.Integration.Players.Crawler.Services
             {
                 var identity = CreateIdentity();
                 await _playersRepository.AddForAsync(identity, player);
-                await _playersIntegration.CreatedForAsync(identity, player);
+                //await _playersIntegration.CreatedForAsync(identity, player);
             }
             else
             {

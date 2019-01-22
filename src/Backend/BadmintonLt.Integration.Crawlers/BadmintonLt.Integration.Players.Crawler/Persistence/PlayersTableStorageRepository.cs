@@ -48,16 +48,26 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence
 
         public async Task AddForAsync(string identity, Player player)
         {
-            if (await ExistsAsync(player))
+            try
             {
-                return;
+                if (await ExistsAsync(player))
+                {
+                    return;
+                }
+
+                var dataSource = await _dataSource;
+                var entity = player.ToPersistedWith(identity);
+                var insertOperation = TableOperation.Insert(entity);
+
+                await dataSource.ExecuteAsync(insertOperation);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
             }
 
-            var dataSource = await _dataSource;
-            var entity = player.ToPersistedWith(identity);
-            var insertOperation = TableOperation.Insert(entity);
-
-            await dataSource.ExecuteAsync(insertOperation);
+            
         }
 
         public async Task<string> GetCorrelationIdentityForAsync(Player player)
