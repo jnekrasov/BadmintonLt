@@ -12,7 +12,7 @@ using BadmintonLt.Integration.Players.Crawler.Persistence.Extensions;
 
 namespace BadmintonLt.Integration.Players.Crawler.Persistence
 {
-    public class PlayersTableStorageRepository : IPlayersRepository, IDisposable
+    public class PlayersTableStorageRepository : IPlayersRepository
     {
         private const string PlayersTableName = "Players";
         private readonly LazyAsync<CloudTable> _dataSource;
@@ -53,9 +53,11 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence
                 return;
             }
 
-            var players = await _playersCache;
+            var dataSource = await _dataSource;
             var entity = player.ToPersistedWith(identity);
-            players.Add((player.LastName, player.FirstName), entity);
+            var insertOperation = TableOperation.Insert(entity);
+
+            await dataSource.ExecuteAsync(insertOperation);
         }
 
         public async Task<string> GetCorrelationIdentityForAsync(Player player)
@@ -77,9 +79,15 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence
                 return;
             }
 
+            var dataSource = await _dataSource;
             var players = await _playersCache;
             var name = (player.LastName, player.FirstName);
-            players[name].ProfileUrl = player.ProfileUrl;
+
+            var existing = players[name];
+            existing.ProfileUrl = player.ProfileUrl;
+
+            var updateOperation = TableOperation.Merge(existing);
+            await dataSource.ExecuteAsync(updateOperation);
         }
 
         private async Task<CloudTable> SetupDataSourceFor(CloudTableClient tableClient)
@@ -99,11 +107,6 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence
             return players.ToDictionary(
                 p => (p.PartitionKey, p.RowKey),
                 p => p);
-        }
-
-        public void Dispose()
-        {
-
         }
     }
 }

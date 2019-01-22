@@ -35,7 +35,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Integration
                     JsonConvert.SerializeObject(payload)))
             {
                 ContentType = "application/json",
-                CorrelationId = identity
+                CorrelationId = identity,
+                UserProperties = { { "eventType", typeof(T).Name } }
             };
         }
     }
