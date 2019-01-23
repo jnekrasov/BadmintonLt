@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Build.Utilities;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace BadmintonLt.Integration.Players.Crawler.Persistence.Extensions
@@ -24,6 +23,20 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence.Extensions
             } while (token != null);
 
             return entities;
+        }
+
+        public static async Task<IEnumerable<TableResult>> ExecuteBatchAsync(
+            this CloudTable dataSource, 
+            IEnumerable<TableBatchOperation> batchOperations)
+        {
+            var result = new List<TableResult>();
+
+            foreach (var batchOperation in batchOperations)
+            {
+                result.AddRange(await dataSource.ExecuteBatchAsync(batchOperation));
+            }
+
+            return result;
         }
     }
 }

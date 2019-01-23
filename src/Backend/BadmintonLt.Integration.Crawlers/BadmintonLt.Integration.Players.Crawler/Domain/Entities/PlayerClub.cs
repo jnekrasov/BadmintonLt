@@ -30,9 +30,9 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Entities
                 throw new ArgumentNullException(nameof(logoUrl));
             }
 
+            ExternalId = externalId;
             Name = name;
             LogoUrl = logoUrl;
-            ExternalId = externalId;
         }
     }
 }

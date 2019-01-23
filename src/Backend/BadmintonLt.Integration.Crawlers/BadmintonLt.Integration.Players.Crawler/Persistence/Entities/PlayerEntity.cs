@@ -13,7 +13,7 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence.Entities
 
         public string ProfileUrl { get; set; }
 
-        public string CorrelationId { get; set; }
+        public string InternalId { get; set; }
 
         public string ClubName { get; set; }
 

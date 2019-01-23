@@ -5,17 +5,17 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence.Extensions
 {
     public static class PlayerPersistenceExtensions
     {
-        public static PlayerEntity ToPersistedWith(this Player player, string identity)
+        public static PlayerEntity ToPersisted(this Player player)
         {
             return new PlayerEntity()
             {
-                PartitionKey = player.Club.ExternalId,
+                PartitionKey = player.ClubInformation.ExternalId,
                 RowKey = player.ExternalId,
                 Gender = player.Gender.NumericEquivalent,
                 ProfileUrl = player.ProfileUrl,
-                CorrelationId = identity,
-                ClubName = player.Club.Name,
-                ClubLogoUrl = player.Club.LogoUrl,
+                InternalId = player.InternalId,
+                ClubName = player.ClubInformation.Name,
+                ClubLogoUrl = player.ClubInformation.LogoUrl,
                 FistName = player.FirstName,
                 LastName = player.LastName
             };
@@ -26,13 +26,14 @@ namespace BadmintonLt.Integration.Players.Crawler.Persistence.Extensions
             return new Player(
                 entity.RowKey,
                 Gender.CreateFrom(entity.Gender),
-                entity.PartitionKey,
-                entity.RowKey,
+                entity.FistName,
+                entity.LastName,
                 entity.ProfileUrl,
                 new PlayerClub(
                     entity.PartitionKey,
                     entity.ClubName,
-                    entity.ClubLogoUrl));
+                    entity.ClubLogoUrl),
+                entity.InternalId);
         }
     }
 }

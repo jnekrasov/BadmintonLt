@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BadmintonLt.Integration.Players.Crawler.Domain.Entities;
 
@@ -6,13 +8,8 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Contracts.Persistence
 {
     public interface IPlayersRepository
     {
-        Task<bool> ExistsAsync(Player player);
+        Task<IEnumerable<Player>> GetAllAsync();
 
-        Task AddForAsync(string identity, Player player);
-
-        Task<string> GetCorrelationIdentityForAsync(Player player);
-
-        Task UpdateAsync(Player player);
-
+        Task InsertOrMergeAsync(IEnumerable<Player> players);
     }
 }

@@ -7,6 +7,6 @@ namespace BadmintonLt.Integration.Players.Crawler.Domain.Contracts.Providers
 {
     public interface IPlayersProvider
     {
-        Task<IEnumerable<Player>> GetPlayersFromAsync(string clubPlayersPageUrl);
+        Task<IEnumerable<Player>> GetPlayersAsync(string sourcePageUrl);
     }
 }
