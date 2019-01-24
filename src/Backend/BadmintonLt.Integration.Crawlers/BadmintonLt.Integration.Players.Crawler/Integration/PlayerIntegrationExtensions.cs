@@ -5,22 +5,16 @@ namespace BadmintonLt.Integration.Players.Crawler.Integration
 {
     public static class PlayerIntegrationExtensions
     {
-        public static PlayerCreatedMessage ToCreatedMessageFor(this Player player, string identity)
+        public static PlayerProfileUpdateMessage ToContract(this Player player)
         {
-            return new PlayerCreatedMessage()
+            return new PlayerProfileUpdateMessage()
             {
-                Id = identity,
                 FirstName = player.FirstName,
+                Id = player.InternalId,
                 LastName = player.LastName,
-                ProfileUrl = player.ProfileUrl
-            };
-        }
-        public static PlayerUpdatedMessage ToUpdatedMessageFor(this Player player, string identity)
-        {
-            return new PlayerUpdatedMessage()
-            {
-                Id = identity,
-                ProfileUrl = player.ProfileUrl
+                ProfileUrl = player.ProfileUrl,
+                ClubLogoUrl = player.ClubInformation.LogoUrl,
+                ClubName = player.ClubInformation.Name
             };
         }
     }

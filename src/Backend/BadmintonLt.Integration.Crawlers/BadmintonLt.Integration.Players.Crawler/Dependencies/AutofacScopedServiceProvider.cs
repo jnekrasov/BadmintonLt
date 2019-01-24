@@ -26,7 +26,7 @@ namespace BadmintonLt.Integration.Players.Crawler.Dependencies
                 c => new PlayersTableStorageRepository(
                     c.GetService<IConfiguration>().GetConnectionString("StorageConnectionString")));
             service.AddScoped<IPlayersIntegration>(
-                c => new PlayersServiceBusTopicsIntegration(
+                c => new PlayersServiceBusIntegration(
                     c.GetService<IConfiguration>().GetConnectionString("MessageBusConnectionString"),
                     c.GetService<IConfiguration>()["PlayersIntegrationTopicName"]));
 

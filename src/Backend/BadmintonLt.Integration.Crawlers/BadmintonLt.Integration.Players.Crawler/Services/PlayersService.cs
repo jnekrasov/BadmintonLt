@@ -43,6 +43,7 @@ namespace BadmintonLt.Integration.Players.Crawler.Services
             }
 
             await _playersRepository.InsertOrMergeAsync(importedPlayers);
+            await _playersIntegration.SchedulePlayerProfilesUpdateAsync(importedPlayers);
         }
     }
 }
