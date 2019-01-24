@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=badmintonplayerprofiles;AccountKey=oYI1bIDVIevqbQuGV3EszCdvuBEDpFvLomEU20rTpFjHbgcVjOa/tF8hXyNHE6M3dgrsTBrcy2/pf2mDlxiHAw==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "PlayerProfilesUpdateSubscription": "PlayerProfilesUpdateSubscription",
+    "PlayersIntegrationTopic": "playersintegration",
+    "MessageBusConnectionString": "Endpoint=sb://badmintonltmessagebus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=/GuHJ1lKIhAYajI4biAw1LCm8SpxTBiZHEsQCMFjx+A="
+  },
+  "ConnectionStrings": {
+    "StorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=badmintonplayerprofiles;AccountKey=oYI1bIDVIevqbQuGV3EszCdvuBEDpFvLomEU20rTpFjHbgcVjOa/tF8hXyNHE6M3dgrsTBrcy2/pf2mDlxiHAw==;EndpointSuffix=core.windows.net"
+  }
+}

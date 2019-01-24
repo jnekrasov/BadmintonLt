@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadmintonLt.Integration.Players.Crawler", "BadmintonLt.Integration.Players.Crawler\BadmintonLt.Integration.Players.Crawler.csproj", "{AD28CDF3-6AB1-4FDA-9B36-1DEAD51BBB0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadmintonLt.Integration.PlayerProfiles.Crawler", "BadmintonLt.Integration.PlayerProfiles.Crawler\BadmintonLt.Integration.PlayerProfiles.Crawler.csproj", "{4DC2CF9C-3D95-4166-8B48-8E1B51814606}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AD28CDF3-6AB1-4FDA-9B36-1DEAD51BBB0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD28CDF3-6AB1-4FDA-9B36-1DEAD51BBB0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD28CDF3-6AB1-4FDA-9B36-1DEAD51BBB0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DC2CF9C-3D95-4166-8B48-8E1B51814606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DC2CF9C-3D95-4166-8B48-8E1B51814606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DC2CF9C-3D95-4166-8B48-8E1B51814606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DC2CF9C-3D95-4166-8B48-8E1B51814606}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
